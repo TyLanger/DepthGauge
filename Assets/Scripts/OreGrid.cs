@@ -49,8 +49,11 @@ public class OreGrid : MonoBehaviour
                 {
                     int r = Random.Range(0, orePrefabs.Length);
                     GameObject copy = Instantiate(orePrefabs[r], transform.position + new Vector3(i * spacing, j * spacing, k * depthSpacing), transform.rotation, layers[k]);
-                    copy.GetComponent<SpriteRenderer>().sortingOrder = -k * 10;
-                    grid[i, j, k] = copy.GetComponent<Ore>();
+                    Ore o = copy.GetComponent<Ore>();
+                    o.SetSortOrder(-k * 10);
+                    grid[i, j, k] = o;
+                    // add to the appropriate events
+                    // allows me to change the alpha of a bunch of them when the player changes depth
                 }
             }
         }
@@ -67,7 +70,7 @@ public class OreGrid : MonoBehaviour
 
     public bool IsSolid(int x, int y, int z)
     {
-        return grid[x, y, z].IsSolid();
+        return grid[x,y,z] && grid[x, y, z].IsSolid();
     }
 
     public void Smash(int x, int y, int z, int power, Side sideHitFrom)

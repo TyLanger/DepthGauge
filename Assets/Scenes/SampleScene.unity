@@ -239,9 +239,9 @@ MonoBehaviour:
   spacing: 1
   depthSpacing: 1
   orePrefabs:
-  - {fileID: 547510853397642253, guid: 1fadf81673db1924bafb75c6dd90dde8, type: 3}
   - {fileID: 1299056222313262261, guid: dbc92f1fc9c50e54fb25305cb77ceca9, type: 3}
-  - {fileID: 2829219960060977224, guid: b295d8595a9038b47ad8e8aba3d4e712, type: 3}
+  - {fileID: 1299056222313262261, guid: dbc92f1fc9c50e54fb25305cb77ceca9, type: 3}
+  - {fileID: 1299056222313262261, guid: dbc92f1fc9c50e54fb25305cb77ceca9, type: 3}
 --- !u!4 &1291575375
 Transform:
   m_ObjectHideFlags: 0

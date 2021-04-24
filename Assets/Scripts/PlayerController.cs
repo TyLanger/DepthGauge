@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 
     float horInput;
     float vertInput;
+    int depthInput;
 
     public float timeBetweenMovements = 0.1f;
     float timeOfLastMovement = -1;
@@ -37,13 +38,24 @@ public class PlayerController : MonoBehaviour
         horInput = Input.GetAxisRaw("Horizontal");
         vertInput = Input.GetAxisRaw("Vertical");
         // even tho I'm clamping input, raw works better
-
+        if(Input.GetKey(KeyCode.R))
+        {
+            depthInput = 1;
+        }
+        else if(Input.GetKey(KeyCode.F))
+        {
+            depthInput = -1;
+        }
+        else
+        {
+            depthInput = 0;
+        }
 
         if (Time.time > timeOfLastMovement + timeBetweenMovements)
         {
             int xMove = (int)Mathf.Clamp(horInput, -1, 1);
             int yMove = (int)Mathf.Clamp(vertInput, -1, 1);
-            if (xMove != 0 || yMove != 0)
+            if (xMove != 0 || yMove != 0 || depthInput != 0)
             {
                 timeOfLastMovement = Time.time;
             }
@@ -52,6 +64,9 @@ public class PlayerController : MonoBehaviour
 
             desiredY = yPos + yMove;
             desiredY = Mathf.Clamp(desiredY, 0, grid.ySize - 1);
+
+            desiredZ = zPos + depthInput;
+            desiredZ = Mathf.Clamp(desiredZ, 0, grid.zSize - 1);
 
             if (grid.IsSolid(desiredX, desiredY, desiredZ))
             {
@@ -64,6 +79,7 @@ public class PlayerController : MonoBehaviour
                 yPos = desiredY;
                 zPos = desiredZ;
                 targetPos = grid.GetPosition(xPos, yPos, zPos);
+                UpdateDepth();
             }
         }
         transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed*Time.deltaTime);
@@ -78,7 +94,7 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(timeBetweenMovements *0.4f); // slightly faster than time between movements
         Side sideHitFrom = GetSideHitFrom(x, y);
         Debug.Log($"Hit from {sideHitFrom}");
-        grid.Smash(x, y, z, 5, sideHitFrom);
+        grid.Smash(x, y, z, 1, sideHitFrom);
         targetPos = oldPos;
     }
 

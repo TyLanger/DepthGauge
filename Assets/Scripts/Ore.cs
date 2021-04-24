@@ -8,11 +8,12 @@ public class Ore : MonoBehaviour
     int currentHp;
     int maxHp = 5;
 
-    GameObject leftSprite;
-    GameObject topSprite;
-    GameObject rightSprite;
-    GameObject bottomSprite;
-    GameObject midSprite;
+    public GameObject leftSprite;
+    public GameObject topSprite;
+    public GameObject rightSprite;
+    public GameObject bottomSprite;
+    public GameObject midSprite;
+
 
     // Start is called before the first frame update
     void Start()
@@ -26,6 +27,27 @@ public class Ore : MonoBehaviour
         
     }
 
+    public void SetSortOrder(int order)
+    {
+        // 0 or -10
+        float darkness = 1 - (-order / 30f);
+        SpriteRenderer left = leftSprite.GetComponent<SpriteRenderer>();
+        left.sortingOrder = order;
+        left.color = new Color(darkness, darkness, darkness);
+        SpriteRenderer top = topSprite.GetComponent<SpriteRenderer>();
+        top.sortingOrder = order;
+        top.color = new Color(darkness, darkness, darkness);
+        SpriteRenderer right = rightSprite.GetComponent<SpriteRenderer>();
+        right.sortingOrder = order;
+        right.color = new Color(darkness, darkness, darkness);
+        SpriteRenderer bottom = bottomSprite.GetComponent<SpriteRenderer>();
+        bottom.sortingOrder = order;
+        bottom.color = new Color(darkness, darkness, darkness);
+        SpriteRenderer mid = midSprite.GetComponent<SpriteRenderer>();
+        mid.sortingOrder = order;
+        mid.color = new Color(darkness, darkness, darkness);
+    }
+
     public bool IsSolid()
     {
         //return leftSprite.activeSelf || topSprite.activeSelf || rightSprite.activeSelf || bottomSprite.activeSelf || midSprite.activeSelf;
@@ -35,15 +57,29 @@ public class Ore : MonoBehaviour
     public void Smash(int power, Side hitFrom)
     {
         // if hit from the left, destroy left sprite first
-        gameObject.SetActive(false);
         
-
         int damageDone = Mathf.Min(currentHp, power);
 
         switch (hitFrom)
         {
             case Side.Left:
-                //SmashFromLeft(damageDone);
+                SmashFromLeft(damageDone);
+                break;
+
+            case Side.Top:
+                SmashFromTop(damageDone);
+                break;
+
+            case Side.Right:
+                SmashFromRight(damageDone);
+                break;
+
+            case Side.Bottom:
+                SmashFromBottom(damageDone);
+                break;
+
+            case Side.Mid:
+                SmashFromSide(damageDone);
                 break;
         }
         currentHp -= damageDone;
@@ -81,6 +117,149 @@ public class Ore : MonoBehaviour
             if (rightSprite.activeSelf)
             {
                 rightSprite.SetActive(false);
+            }
+
+        }
+    }
+    void SmashFromTop(int damageDone)
+    {
+
+        for (int i = 0; i < damageDone; i++)
+        {
+            if (topSprite.activeSelf)
+            {
+                topSprite.SetActive(false);
+                continue;
+            }
+
+            // how to randomize?
+            if (leftSprite.activeSelf)
+            {
+                leftSprite.SetActive(false);
+                continue;
+            }
+            if (midSprite.activeSelf)
+            {
+                midSprite.SetActive(false);
+                continue;
+            }
+            if (rightSprite.activeSelf)
+            {
+                rightSprite.SetActive(false);
+                continue;
+            }
+
+            if (bottomSprite.activeSelf)
+            {
+                bottomSprite.SetActive(false);
+            }
+
+        }
+    }
+
+    void SmashFromRight(int damageDone)
+    {
+
+        for (int i = 0; i < damageDone; i++)
+        {
+            if (rightSprite.activeSelf)
+            {
+                rightSprite.SetActive(false);
+                continue;
+            }
+
+            // how to randomize?
+            if (topSprite.activeSelf)
+            {
+                topSprite.SetActive(false);
+                continue;
+            }
+            if (midSprite.activeSelf)
+            {
+                midSprite.SetActive(false);
+                continue;
+            }
+            if (bottomSprite.activeSelf)
+            {
+                bottomSprite.SetActive(false);
+                continue;
+            }
+
+            if (leftSprite.activeSelf)
+            {
+                leftSprite.SetActive(false);
+            }
+
+        }
+    }
+
+    void SmashFromBottom(int damageDone)
+    {
+
+        for (int i = 0; i < damageDone; i++)
+        {
+            if (bottomSprite.activeSelf)
+            {
+                bottomSprite.SetActive(false);
+                continue;
+            }
+
+            // how to randomize?
+            if (leftSprite.activeSelf)
+            {
+                leftSprite.SetActive(false);
+                continue;
+            }
+            if (midSprite.activeSelf)
+            {
+                midSprite.SetActive(false);
+                continue;
+            }
+            if (rightSprite.activeSelf)
+            {
+                rightSprite.SetActive(false);
+                continue;
+            }
+
+            if (topSprite.activeSelf)
+            {
+                topSprite.SetActive(false);
+            }
+
+        }
+    }
+
+    void SmashFromSide(int damageDone)
+    {
+
+        for (int i = 0; i < damageDone; i++)
+        {
+            if (midSprite.activeSelf)
+            {
+                midSprite.SetActive(false);
+                continue;
+            }
+
+            // how to randomize?
+            if (leftSprite.activeSelf)
+            {
+                leftSprite.SetActive(false);
+                continue;
+            }
+            if (topSprite.activeSelf)
+            {
+                topSprite.SetActive(false);
+                continue;
+            }
+            if (rightSprite.activeSelf)
+            {
+                rightSprite.SetActive(false);
+                continue;
+            }
+
+            if (bottomSprite.activeSelf)
+            {
+                bottomSprite.SetActive(false);
             }
 
         }
