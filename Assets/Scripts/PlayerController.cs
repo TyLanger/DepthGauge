@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,6 +22,9 @@ public class PlayerController : MonoBehaviour
     public float timeBetweenMovements = 0.1f;
     float timeOfLastMovement = -1;
     public float moveSpeed = 1;
+    public int pickPower = 1;
+
+    public event Action<int> OnPlayerChangeLayer;
 
     Vector3 targetPos;
 
@@ -30,6 +34,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        targetPos = transform.position;
     }
 
     // Update is called once per frame
@@ -38,7 +43,9 @@ public class PlayerController : MonoBehaviour
         horInput = Input.GetAxisRaw("Horizontal");
         vertInput = Input.GetAxisRaw("Vertical");
         // even tho I'm clamping input, raw works better
-        if(Input.GetKey(KeyCode.R))
+        int xMove = (int)Mathf.Clamp(horInput, -1, 1);
+        int yMove = (int)Mathf.Clamp(vertInput, -1, 1);
+        if (Input.GetKey(KeyCode.R))
         {
             depthInput = 1;
         }
@@ -51,14 +58,10 @@ public class PlayerController : MonoBehaviour
             depthInput = 0;
         }
 
-        if (Time.time > timeOfLastMovement + timeBetweenMovements)
+        if ((Time.time > timeOfLastMovement + timeBetweenMovements) && (xMove != 0 || yMove != 0 || depthInput != 0))
         {
-            int xMove = (int)Mathf.Clamp(horInput, -1, 1);
-            int yMove = (int)Mathf.Clamp(vertInput, -1, 1);
-            if (xMove != 0 || yMove != 0 || depthInput != 0)
-            {
-                timeOfLastMovement = Time.time;
-            }
+            timeOfLastMovement = Time.time;
+
             desiredX = xPos + xMove;
             desiredX = Mathf.Clamp(desiredX, 0, grid.xSize - 1);
 
@@ -93,8 +96,7 @@ public class PlayerController : MonoBehaviour
         targetPos = transform.position + (smashPos - transform.position)/2;
         yield return new WaitForSeconds(timeBetweenMovements *0.4f); // slightly faster than time between movements
         Side sideHitFrom = GetSideHitFrom(x, y);
-        Debug.Log($"Hit from {sideHitFrom}");
-        grid.Smash(x, y, z, 1, sideHitFrom);
+        grid.Smash(x, y, z, pickPower, sideHitFrom);
         targetPos = oldPos;
     }
 
@@ -123,5 +125,6 @@ public class PlayerController : MonoBehaviour
     void UpdateDepth()
     {
         spriteRenderer.sortingOrder = -zPos * 10 + 5; // +5 to stay on top of blocks
+        OnPlayerChangeLayer?.Invoke(zPos);
     }
 }

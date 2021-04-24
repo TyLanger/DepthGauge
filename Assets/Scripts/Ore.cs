@@ -14,7 +14,6 @@ public class Ore : MonoBehaviour
     public GameObject bottomSprite;
     public GameObject midSprite;
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -29,23 +28,17 @@ public class Ore : MonoBehaviour
 
     public void SetSortOrder(int order)
     {
-        // 0 or -10
-        float darkness = 1 - (-order / 30f);
+        // 0 or -10 or -20...
         SpriteRenderer left = leftSprite.GetComponent<SpriteRenderer>();
         left.sortingOrder = order;
-        left.color = new Color(darkness, darkness, darkness);
         SpriteRenderer top = topSprite.GetComponent<SpriteRenderer>();
         top.sortingOrder = order;
-        top.color = new Color(darkness, darkness, darkness);
         SpriteRenderer right = rightSprite.GetComponent<SpriteRenderer>();
         right.sortingOrder = order;
-        right.color = new Color(darkness, darkness, darkness);
         SpriteRenderer bottom = bottomSprite.GetComponent<SpriteRenderer>();
         bottom.sortingOrder = order;
-        bottom.color = new Color(darkness, darkness, darkness);
         SpriteRenderer mid = midSprite.GetComponent<SpriteRenderer>();
         mid.sortingOrder = order;
-        mid.color = new Color(darkness, darkness, darkness);
     }
 
     public bool IsSolid()
