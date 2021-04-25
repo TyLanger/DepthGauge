@@ -7,6 +7,7 @@ public class Ore : MonoBehaviour
 
     int currentHp;
     int maxHp = 5;
+    public int hardness = 0; // high hardness takes stronger pick/more hits
 
     public GameObject leftSprite;
     public GameObject topSprite;
@@ -30,15 +31,20 @@ public class Ore : MonoBehaviour
     {
         // 0 or -10 or -20...
         SpriteRenderer left = leftSprite.GetComponent<SpriteRenderer>();
-        left.sortingOrder = order;
+        if(left)
+            left.sortingOrder = order;
         SpriteRenderer top = topSprite.GetComponent<SpriteRenderer>();
-        top.sortingOrder = order;
+        if(top)
+            top.sortingOrder = order;
         SpriteRenderer right = rightSprite.GetComponent<SpriteRenderer>();
-        right.sortingOrder = order;
+        if(right)
+            right.sortingOrder = order;
         SpriteRenderer bottom = bottomSprite.GetComponent<SpriteRenderer>();
-        bottom.sortingOrder = order;
+        if(bottom)
+            bottom.sortingOrder = order;
         SpriteRenderer mid = midSprite.GetComponent<SpriteRenderer>();
-        mid.sortingOrder = order;
+        if(mid)
+            mid.sortingOrder = order;
     }
 
     public bool IsSolid()
@@ -50,30 +56,38 @@ public class Ore : MonoBehaviour
     public void Smash(int power, Side hitFrom)
     {
         // if hit from the left, destroy left sprite first
-        
+        power = Mathf.Clamp(power-hardness, 0, maxHp);
         int damageDone = Mathf.Min(currentHp, power);
-
-        switch (hitFrom)
+        if (damageDone > 0)
         {
-            case Side.Left:
-                SmashFromLeft(damageDone);
-                break;
+            switch (hitFrom)
+            {
+                case Side.Left:
+                    SmashFromLeft(damageDone);
+                    break;
 
-            case Side.Top:
-                SmashFromTop(damageDone);
-                break;
+                case Side.Top:
+                    SmashFromTop(damageDone);
+                    break;
 
-            case Side.Right:
-                SmashFromRight(damageDone);
-                break;
+                case Side.Right:
+                    SmashFromRight(damageDone);
+                    break;
 
-            case Side.Bottom:
-                SmashFromBottom(damageDone);
-                break;
+                case Side.Bottom:
+                    SmashFromBottom(damageDone);
+                    break;
 
-            case Side.Mid:
-                SmashFromSide(damageDone);
-                break;
+                case Side.Mid:
+                    SmashFromSide(damageDone);
+                    break;
+            }
+        }
+        else
+        {
+            // ore was too hard
+            // send a message?
+            //return 0?
         }
         currentHp -= damageDone;
     }

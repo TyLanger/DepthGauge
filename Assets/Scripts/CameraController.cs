@@ -6,6 +6,8 @@ public class CameraController : MonoBehaviour
 {
 
     public Transform target;
+    Vector3 targetPoint;
+    PlayerController player;
     public Vector3 offset;
     public Vector3 baseOffset;
     public Vector3 minOffset;
@@ -21,16 +23,19 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         baseOffset = offset;
-        target.GetComponent<PlayerController>().OnPlayerChangeLayer += PlayerChangeLayer;
+        player = target.GetComponent<PlayerController>();
+        player.OnPlayerChangeLayer += PlayerChangeLayer;
+
     }
 
     // Update is called once per frame
     void Update()
     {
         offset = Vector3.Slerp(baseOffset, minOffset, targetZ / 4f);
+        targetPoint = player.GetGridPosition();
         //offset = new Vector3(target.position.x, target.position.y, )
         //offset = new Vector3(baseOffset.x, baseOffset.y, Mathf.Lerp(baseOffset.z, maxCloseup, Mathf.Pow((target.position.z / 4f), 2)));
-        transform.position = Vector3.MoveTowards(transform.position, target.position + offset, Time.deltaTime * moveSpeed);
+        transform.position = Vector3.MoveTowards(transform.position, targetPoint + offset, Time.deltaTime * moveSpeed);
     }
 
     void PlayerChangeLayer(int playerZ)

@@ -127,4 +127,9 @@ public class PlayerController : MonoBehaviour
         spriteRenderer.sortingOrder = -zPos * 10 + 5; // +5 to stay on top of blocks
         OnPlayerChangeLayer?.Invoke(zPos);
     }
+
+    public Vector3 GetGridPosition()
+    {
+        return grid.GetPosition(xPos, yPos, zPos);
+    }
 }
