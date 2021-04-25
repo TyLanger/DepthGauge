@@ -284,8 +284,7 @@ MonoBehaviour:
   baseOffset: {x: 0, y: 0, z: 0}
   minOffset: {x: 0, y: -0.25, z: -2.7}
   maxCloseup: -2.5
-  claustrophobiaModifier: -1
-  maxAngle: -8
+  closeScaling: 8
   moveSpeed: 1.4
 --- !u!20 &519420031
 Camera:

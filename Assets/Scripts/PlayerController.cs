@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         targetPos = transform.position;
+        Ore.OnMined += CollectOre;
     }
 
     // Update is called once per frame
@@ -99,6 +100,11 @@ public class PlayerController : MonoBehaviour
         Side sideHitFrom = GetSideHitFrom(x, y);
         gridManager.Smash(x, y, z, pickPower, sideHitFrom);
         targetPos = oldPos;
+    }
+
+    void CollectOre(OreType type, int amount)
+    {
+        Debug.Log($"Gained {type} ({amount})");
     }
 
     Side GetSideHitFrom(int blockX, int blockY)

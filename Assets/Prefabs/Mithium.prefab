@@ -214,11 +214,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2b7f8891623d8348818b06b7a474056, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hardness: 0
   leftSprite: {fileID: 3158087384854335880}
   topSprite: {fileID: 3158087384759970800}
   rightSprite: {fileID: 3158087385272235922}
   bottomSprite: {fileID: 3158087386477451534}
   midSprite: {fileID: 3158087385961884544}
+  oreType: 4
 --- !u!1 &3158087385272235922
 GameObject:
   m_ObjectHideFlags: 0

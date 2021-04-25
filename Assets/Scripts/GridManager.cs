@@ -45,7 +45,7 @@ public class GridManager : MonoBehaviour
 
     int deepX = 10;
     int deepY = 5;
-    int deepZ = 5; // not sure if it works with a higher value
+    int deepZ = 10; // not sure if it works with a higher value
 
     // Start is called before the first frame update
     void Start()

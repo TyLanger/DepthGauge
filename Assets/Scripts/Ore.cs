@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Ore : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class Ore : MonoBehaviour
     public GameObject rightSprite;
     public GameObject bottomSprite;
     public GameObject midSprite;
+
+    public OreType oreType;
+    public static event Action<OreType, int> OnMined;
 
     // Start is called before the first frame update
     void Awake()
@@ -91,6 +95,7 @@ public class Ore : MonoBehaviour
             //return 0?
         }
         currentHp -= damageDone;
+        OnMined?.Invoke(oreType, damageDone);
     }
 
     void SmashFromLeft(int damageDone)
@@ -275,3 +280,5 @@ public class Ore : MonoBehaviour
 }
 
 public enum Side { Left, Top, Right, Bottom, Mid};
+// Granicrete, Cobblite, Ironium/Ferrium, Mithium, Aurite/Gold
+public enum OreType { Dirt, Cobblite, Bouldite, Ferrium, Mithium, Dugium};

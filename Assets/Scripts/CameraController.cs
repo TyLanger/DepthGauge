@@ -15,8 +15,7 @@ public class CameraController : MonoBehaviour
     float targetZ = 0;
 
     public float maxCloseup = -2.5f;
-    public float claustrophobiaModifier = -0.5f;
-    public float maxAngle = -8;
+    public float closeScaling = 4f;
     public float moveSpeed = 1;
 
     // Start is called before the first frame update
@@ -31,7 +30,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        offset = Vector3.Slerp(baseOffset, minOffset, targetZ / 4f);
+        offset = Vector3.Slerp(baseOffset, minOffset, targetZ / closeScaling);
         targetPoint = player.GetGridPosition();
         //offset = new Vector3(target.position.x, target.position.y, )
         //offset = new Vector3(baseOffset.x, baseOffset.y, Mathf.Lerp(baseOffset.z, maxCloseup, Mathf.Pow((target.position.z / 4f), 2)));
