@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
 
     public OreGrid grid;
+    public GridManager gridManager;
     public int xPos = 5;
     public int yPos = 5;
     public int zPos = 0;
@@ -63,15 +64,15 @@ public class PlayerController : MonoBehaviour
             timeOfLastMovement = Time.time;
 
             desiredX = xPos + xMove;
-            desiredX = Mathf.Clamp(desiredX, 0, grid.xSize - 1);
+            //desiredX = Mathf.Clamp(desiredX, 0, grid.xSize - 1);
 
             desiredY = yPos + yMove;
-            desiredY = Mathf.Clamp(desiredY, 0, grid.ySize - 1);
+            //desiredY = Mathf.Clamp(desiredY, 0, grid.ySize - 1);
 
             desiredZ = zPos + depthInput;
-            desiredZ = Mathf.Clamp(desiredZ, 0, grid.zSize - 1);
+            //desiredZ = Mathf.Clamp(desiredZ, 0, grid.zSize - 1);
 
-            if (grid.IsSolid(desiredX, desiredY, desiredZ))
+            if (gridManager.IsSolid(desiredX, desiredY, desiredZ))
             {
                 // try to sttack
                 StartCoroutine(Smash(desiredX, desiredY, desiredZ));
@@ -81,7 +82,7 @@ public class PlayerController : MonoBehaviour
                 xPos = desiredX;
                 yPos = desiredY;
                 zPos = desiredZ;
-                targetPos = grid.GetPosition(xPos, yPos, zPos);
+                targetPos = gridManager.GetPosition(xPos, yPos, zPos);
                 UpdateDepth();
             }
         }
@@ -91,12 +92,12 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator Smash(int x, int y, int z)
     {
-        Vector3 smashPos = grid.GetPosition(x, y, z);
+        Vector3 smashPos = gridManager.GetPosition(x, y, z);
         Vector3 oldPos = transform.position;
         targetPos = transform.position + (smashPos - transform.position)/2;
         yield return new WaitForSeconds(timeBetweenMovements *0.4f); // slightly faster than time between movements
         Side sideHitFrom = GetSideHitFrom(x, y);
-        grid.Smash(x, y, z, pickPower, sideHitFrom);
+        gridManager.Smash(x, y, z, pickPower, sideHitFrom);
         targetPos = oldPos;
     }
 
@@ -130,6 +131,6 @@ public class PlayerController : MonoBehaviour
 
     public Vector3 GetGridPosition()
     {
-        return grid.GetPosition(xPos, yPos, zPos);
+        return gridManager.GetPosition(xPos, yPos, zPos);
     }
 }

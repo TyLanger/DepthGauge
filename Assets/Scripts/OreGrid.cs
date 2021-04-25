@@ -12,6 +12,8 @@ public class OreGrid : MonoBehaviour
     public float spacing;
     public float depthSpacing;
 
+    public Vector3 offset;
+
     Ore[,,] grid;
 
     public float layerMoveSpeed = 1;
@@ -23,17 +25,21 @@ public class OreGrid : MonoBehaviour
 
     private void Start()
     {
-        BuildGrid();
-        HideMiddleTester();
+
+        //BuildGrid();
+        //HideMiddleTester();
 
         //Debug.Log($"Pos 5,5,0: {GetPosition(5, 5, 0)}");
     }
 
     private void Update()
     {
-        for (int i = 0; i < layerTargets.Length; i++)
+        if (layerTargets != null && (layerTargets.Length > 0))
         {
-            layers[i].transform.position = Vector3.MoveTowards(layers[i].transform.position, layerTargets[i], Time.deltaTime * layerMoveSpeed);
+            for (int i = 0; i < layerTargets.Length; i++)
+            {
+                layers[i].transform.position = Vector3.MoveTowards(layers[i].transform.position, layerTargets[i], Time.deltaTime * layerMoveSpeed);
+            }
         }
     }
 
@@ -49,9 +55,14 @@ public class OreGrid : MonoBehaviour
             copy.transform.parent = transform;
             layers[i] = copy.transform;
         }
+        
+        //Randomize();
+    }
+
+    public void SetupPlayer()
+    {
         player.OnPlayerChangeLayer += AdjustLayers;
         AdjustLayers(0);
-        Randomize();
     }
 
     void Randomize()
@@ -74,6 +85,19 @@ public class OreGrid : MonoBehaviour
         }
     }
 
+    public void Fill(int x, int y, int z, int r, int damage, Side side)
+    {
+        GameObject copy = Instantiate(orePrefabs[r], transform.position + new Vector3(x * spacing, y * spacing, z * depthSpacing), transform.rotation, layers[z]);
+        Ore o = copy.GetComponent<Ore>();
+        o.SetSortOrder(-z * 10);
+        if (damage > 0)
+        {
+            //Debug.Log($"Random Damage {damage}");
+            o.Smash(damage, side);
+        }
+        grid[x, y, z] = o;
+    }
+
     public Vector3 GetPosition(int x, int y, int z)
     {
         x = Mathf.Clamp(x, 0, xSize);
@@ -85,12 +109,34 @@ public class OreGrid : MonoBehaviour
 
     public bool IsSolid(int x, int y, int z)
     {
-        return grid[x,y,z] && grid[x, y, z].IsSolid();
+        //Debug.Log($"Solid {x}, {y}, {z}");
+        if (isWithinBounds(x, y, z))
+        {
+            return grid[x, y, z] && grid[x, y, z].IsSolid();
+        }
+        return true;
     }
 
     public void Smash(int x, int y, int z, int power, Side sideHitFrom)
     {
-        grid[x, y, z].Smash(power, sideHitFrom);
+        //Debug.Log($"smash? {x}, {y}, {z}");
+        if (isWithinBounds(x, y, z))
+        {
+            grid[x, y, z].Smash(power, sideHitFrom);
+        }
+    }
+
+    bool isWithinBounds(int x, int y, int z)
+    {
+        if(x>=0 && y >= 0 && z>=0 && x<xSize && y<ySize && z<zSize)
+        {
+            return true;
+        }
+        else
+        {
+            Debug.Log($"Out of bounds {x}, {y}, {z}");
+            return false;
+        }
     }
 
     void AdjustLayers(int playerZ)

@@ -16,7 +16,7 @@ public class Ore : MonoBehaviour
     public GameObject midSprite;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         currentHp = maxHp;
     }
@@ -55,6 +55,7 @@ public class Ore : MonoBehaviour
 
     public void Smash(int power, Side hitFrom)
     {
+        //Debug.Log($"smash2? {power} {hitFrom}");
         // if hit from the left, destroy left sprite first
         power = Mathf.Clamp(power-hardness, 0, maxHp);
         int damageDone = Mathf.Min(currentHp, power);
