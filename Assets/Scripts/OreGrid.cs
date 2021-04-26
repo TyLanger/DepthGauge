@@ -15,6 +15,8 @@ public class OreGrid : MonoBehaviour
     public Vector3 offset;
 
     Ore[,,] grid;
+    bool built = false;
+    bool canMove = false;
 
     public float layerMoveSpeed = 1;
     Transform[] layers;
@@ -34,35 +36,64 @@ public class OreGrid : MonoBehaviour
 
     private void Update()
     {
-        if (layerTargets != null && (layerTargets.Length > 0))
+        if (canMove)
         {
-            for (int i = 0; i < layerTargets.Length; i++)
+            if (layerTargets != null && (layerTargets.Length > 0))
             {
-                layers[i].transform.position = Vector3.MoveTowards(layers[i].transform.position, layerTargets[i], Time.deltaTime * layerMoveSpeed);
+                for (int i = 0; i < layerTargets.Length; i++)
+                {
+                    layers[i].transform.position = Vector3.MoveTowards(layers[i].transform.position, layerTargets[i], Time.deltaTime * layerMoveSpeed);
+                }
             }
         }
     }
 
     public void BuildGrid()
     {
-        grid = new Ore[xSize, ySize, zSize];
-        layers = new Transform[zSize];
-        layerTargets = new Vector3[layers.Length];
+        if (!built)
+        {
+            grid = new Ore[xSize, ySize, zSize];
+            layers = new Transform[zSize];
+            layerTargets = new Vector3[layers.Length];
+            built = true; 
+            // check this so I can call build to rebuild without doing these steps again
+            // although, these steps are probably the easiest
+        }
+        BuildLayers();
+        canMove = true;
+        //Randomize();
+    }
+
+    void BuildLayers()
+    {
         for (int i = 0; i < layers.Length; i++)
         {
             GameObject copy = new GameObject($"Layer {i}");
-            copy.transform.position = transform.position + new Vector3(0, 0, i*depthSpacing);
+            copy.transform.position = transform.position + new Vector3(0, 0, i * depthSpacing);
             copy.transform.parent = transform;
             layers[i] = copy.transform;
         }
-        
-        //Randomize();
+    }
+
+    public void DestroyRocks()
+    {
+        canMove = false;
+        for (int i = 0; i < layers.Length; i++)
+        {
+            Destroy(layers[i].gameObject);
+        }
+        //BuildLayers();
     }
 
     public void SetupPlayer()
     {
         player.OnPlayerChangeLayer += AdjustLayers;
         AdjustLayers(0);
+    }
+
+    public void UnSmash(int x, int y, int z)
+    {
+        grid[x, y, z].UnSmash();
     }
 
     void Randomize()
@@ -93,7 +124,7 @@ public class OreGrid : MonoBehaviour
         if (damage > 0)
         {
             //Debug.Log($"Random Damage {damage}");
-            o.Smash(damage, side);
+            o.Smash(damage, side, true);
         }
         grid[x, y, z] = o;
     }
@@ -117,12 +148,12 @@ public class OreGrid : MonoBehaviour
         return true;
     }
 
-    public void Smash(int x, int y, int z, int power, Side sideHitFrom)
+    public void Smash(int x, int y, int z, int power, Side sideHitFrom, bool obliterate = false)
     {
         //Debug.Log($"smash? {x}, {y}, {z}");
         if (isWithinBounds(x, y, z))
         {
-            grid[x, y, z].Smash(power, sideHitFrom);
+            grid[x, y, z].Smash(power, sideHitFrom, obliterate);
         }
     }
 

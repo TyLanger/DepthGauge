@@ -57,7 +57,17 @@ public class Ore : MonoBehaviour
         return currentHp > 0;
     }
 
-    public void Smash(int power, Side hitFrom)
+    public void UnSmash()
+    {
+        currentHp = maxHp;
+        leftSprite.SetActive(true);
+        topSprite.SetActive(true);
+        rightSprite.SetActive(true);
+        bottomSprite.SetActive(true);
+        midSprite.SetActive(true);
+    }
+
+    public virtual void Smash(int power, Side hitFrom, bool obliterate=false)
     {
         //Debug.Log($"smash2? {power} {hitFrom}");
         // if hit from the left, destroy left sprite first
@@ -95,7 +105,10 @@ public class Ore : MonoBehaviour
             //return 0?
         }
         currentHp -= damageDone;
-        OnMined?.Invoke(oreType, damageDone);
+        if (!obliterate)
+        {
+            OnMined?.Invoke(oreType, damageDone);
+        }
     }
 
     void SmashFromLeft(int damageDone)

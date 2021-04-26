@@ -274,7 +274,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 260740066}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 6.5, z: 0}
+  m_LocalPosition: {x: 1.5, y: 7.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -316,7 +316,7 @@ MonoBehaviour:
   midLayer: {fileID: 0}
   lowerLayer: {fileID: 0}
   deepLayer: {fileID: 0}
-  surfaceOffset: {x: -2.5, y: 5.5, z: 0}
+  surfaceOffset: {x: -5.5, y: 5.5, z: 0}
   topOffset: {x: -4.5, y: -4.5, z: 0}
   midOffset: {x: -6.5, y: -9.5, z: 0}
   lowOffset: {x: -6.5, y: -16.5, z: 0}
@@ -433,7 +433,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 5, z: -5}
+  m_LocalPosition: {x: -5.5, y: 6, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -548,7 +548,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1548100855}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 5.5, z: 0}
+  m_LocalPosition: {x: -5.5, y: 6.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -576,7 +576,9 @@ MonoBehaviour:
   moveSpeed: 1.5
   fallSpeed: 5
   pickPower: 1
+  maxPickPower: 3
   backPackCap: 50
+  maxBackPackCap: 150
   pickupTextPrefab: {fileID: 315060289, guid: 491f8aca2ace8fd48a1f4084052950e7, type: 3}
 --- !u!1 &1781844443
 GameObject:
@@ -697,7 +699,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1839100234}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.21, y: 5.53, z: 0}
+  m_LocalPosition: {x: 2.5, y: 6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -821,7 +823,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!120 &1998356667
 LineRenderer:
   m_ObjectHideFlags: 0

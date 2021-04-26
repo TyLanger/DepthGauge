@@ -23,8 +23,8 @@ public class PlayerController : MonoBehaviour
     int xMove;
     int yMove;
     Direction lastDirection;
-    int lastAnchorX = 3; // maybe I should do these in start?
-    int lastAnchorY = -1;
+    int lastAnchorX = 7; // maybe I should do these in start?
+    int lastAnchorY = 1;
     int lastAnchorZ = 0;
     public Rope rope;
     bool usingRope = false;
@@ -36,8 +36,12 @@ public class PlayerController : MonoBehaviour
     bool playerControlled = true;
 
     public int pickPower = 1;
+    public int maxPickPower = 3;
+    int backPack = 0;
     public int backPackCap = 50;
+    public int maxBackPackCap = 150;
     int[] currentOres;
+    int money = 0;
     
     public TextFade pickupTextPrefab;
     Queue<TextFade> pickupTextQueue;
@@ -88,10 +92,8 @@ public class PlayerController : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.G) && !usingRope)
         {
-            // recall rope
-            usingRope = true;
-            OnRopeStart?.Invoke();
-            rope.StartPulling();
+            UseRope();
+
         }
 
         if ((Time.time > timeOfLastMovement + timeBetweenMovements) && (xMove != 0 || yMove != 0 || depthInput != 0) && playerControlled)
@@ -131,6 +133,16 @@ public class PlayerController : MonoBehaviour
         //transform.position = Vector3.MoveTowards(transform.position, )
     }
 
+    private void UseRope()
+    {
+        if (!usingRope)
+        {
+            usingRope = true;
+            OnRopeStart?.Invoke();
+            rope.StartPulling();
+        }
+    }
+
     IEnumerator Smash(int x, int y, int z)
     {
         Vector3 smashPos = gridManager.GetPosition(x, y, z);
@@ -146,6 +158,7 @@ public class PlayerController : MonoBehaviour
     void CollectOre(OreType type, int amount)
     {
         currentOres[(int)type] += amount;
+        backPack += amount;
         // +amount type (total)
         //Debug.Log($"Gained {type} ({currentOres[(int)type]})");
 
@@ -163,6 +176,36 @@ public class PlayerController : MonoBehaviour
         next.Reset();
         pickupTextQueue.Enqueue(next); // recycle
         //pickupText.text = $"+{amount} {type} ({currentOres[(int)type]})";
+        if(backPack >= backPackCap)
+        {
+            BagFull();
+        }
+    }
+
+    void BagFull()
+    {
+        // maybe wait a sec
+        //UseRope();
+    }
+
+    public void UpgradePick()
+    {
+        pickPower++;
+    }
+
+    public void UpgradePack()
+    {
+        backPackCap += 50;
+    }
+
+    public bool CanPay(int price)
+    {
+        return money >= price;
+    }
+
+    public void Pay(int price)
+    {
+        money -= price;
     }
 
     Side GetSideHitFrom(int blockX, int blockY)
@@ -306,15 +349,15 @@ public class PlayerController : MonoBehaviour
 
     public void ReachedTopOfRope()
     {
-        // this is where gridManager spawns you at the start
-        xPos = 3;
-        yPos = 0;
+        // square the rope is at
+        xPos = 7;
+        yPos = 1;
         zPos = 0;
         targetPos = GetGridPosition(); // so you stay put
         usingRope = false;
 
-        lastAnchorX = 3;
-        lastAnchorY = -1;
+        lastAnchorX = 7;
+        lastAnchorY = 1;
         lastAnchorZ = 0;
 
         UpdateDepth();

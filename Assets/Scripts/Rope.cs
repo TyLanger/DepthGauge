@@ -16,7 +16,7 @@ public class Rope : MonoBehaviour
     LineRenderer line;
     Vector3[] points;
 
-    int index = 2;
+    //int index = 2;
 
     // Start is called before the first frame update
     void Start()

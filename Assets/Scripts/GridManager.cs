@@ -27,8 +27,8 @@ public class GridManager : MonoBehaviour
 
          */
 
-    int surfaceX = 5;
-    int surfaceY = 1;
+    int surfaceX = 14;
+    int surfaceY = 3;
     int surfaceZ = 1;
 
     int topX = 10;
@@ -73,16 +73,16 @@ public class GridManager : MonoBehaviour
                 return surface.IsSolid(x, y, z);
 
             case 1:
-                return topLayer.IsSolid(x + 2, y + 10, z);
+                return topLayer.IsSolid(x -1, y + 10, z);
 
             case 2:
-                return midLayer.IsSolid(x + 4, y + 15, z);
+                return midLayer.IsSolid(x + 1, y + 15, z);
 
             case 3:
-                return lowerLayer.IsSolid(x + 4, y + 22, z);
+                return lowerLayer.IsSolid(x + 1, y + 22, z);
 
             case 4:
-                return deepLayer.IsSolid(x + 2, y + 27, z);
+                return deepLayer.IsSolid(x -1, y + 27, z);
         }
         return true;
     }
@@ -96,44 +96,44 @@ public class GridManager : MonoBehaviour
                 return surface.GetPosition(x, y, z);
 
             case 1:
-                return topLayer.GetPosition(x+2, y+10, z);
+                return topLayer.GetPosition(x-1, y+10, z);
 
             case 2:
-                return midLayer.GetPosition(x+4, y+15, z);
+                return midLayer.GetPosition(x+1, y+15, z);
 
             case 3:
-                return lowerLayer.GetPosition(x + 4, y + 22, z);
+                return lowerLayer.GetPosition(x + 1, y + 22, z);
                 
             case 4:
-                return deepLayer.GetPosition(x + 2, y + 27, z);
+                return deepLayer.GetPosition(x -1, y + 27, z);
                 
         }
         return Vector3.zero;
     }
 
-    public void Smash(int x, int y, int z, int power, Side hitFrom)
+    public void Smash(int x, int y, int z, int power, Side hitFrom, bool obliterate = false)
     {
         int g = GetGrid(x, y, z);
         switch (g)
         {
             case 0:
-                surface.Smash(x, y, z, power, hitFrom);
+                surface.Smash(x, y, z, power, hitFrom, obliterate);
                 break;
 
             case 1:
-                topLayer.Smash(x + 2, y + 10, z, power, hitFrom);
+                topLayer.Smash(x -1, y + 10, z, power, hitFrom, obliterate);
                 break;
 
             case 2:
-                midLayer.Smash(x + 4, y + 10+5, z, power, hitFrom);
+                midLayer.Smash(x +1, y + 10 + 5, z, power, hitFrom, obliterate);
                 break;
 
             case 3:
-                lowerLayer.Smash(x + 4, y + 15+7, z, power, hitFrom);
+                lowerLayer.Smash(x + 1, y + 15 + 7, z, power, hitFrom, obliterate);
                 break;
 
             case 4:
-                deepLayer.Smash(x + 2, y + 22+5, z, power, hitFrom);
+                deepLayer.Smash(x -1, y + 22 + 5, z, power, hitFrom, obliterate);
                 break;
         }
     }
@@ -141,23 +141,23 @@ public class GridManager : MonoBehaviour
     int GetGrid(int x, int y, int z)
     {
         y = -y;
-        if (y < surfaceY)
+        if (y < 1)
         {
             return 0;// surface;
         }
-        else if (y < surfaceY + topY)
+        else if (y < 1 + topY)
         {
             return 1;// topLayer;
         }
-        else if (y < surfaceY + topY + midY)
+        else if (y < 1 + topY + midY)
         {
             return 2;// midLayer;
         }
-        else if (y < surfaceY + topY + midY + lowY)
+        else if (y < 1 + topY + midY + lowY)
         {
             return 3; // low
         }
-        else if (y < surfaceY + topY + midY + lowY + deepY)
+        else if (y < 1 + topY + midY + lowY + deepY)
         {
             return 4; // deep
         }
@@ -172,14 +172,9 @@ public class GridManager : MonoBehaviour
         lowerLayer = Instantiate(prefab, transform.position + lowOffset, transform.rotation, transform);
         deepLayer = Instantiate(prefab, transform.position + deepOffset, transform.rotation, transform);
 
-        //Debug.Log("Build Surface");
         BuildSurface();
-        //Debug.Log("Build Top");
         BuildTopLayer();
-        //Debug.Log("Build Mid");
-
         BuildMidLayer();
-
         BuildLowLayer();
         BuildDeepLayer();
         /*
@@ -191,6 +186,22 @@ public class GridManager : MonoBehaviour
          */
         //Debug.Log("Finish");
         FinishWorld();
+    }
+
+    void ResetWorld()
+    {
+        topLayer.DestroyRocks();
+        midLayer.DestroyRocks();
+        lowerLayer.DestroyRocks();
+        deepLayer.DestroyRocks();
+
+        surface.UnSmash(7, 0, 0);
+
+        BuildTopLayer();
+        BuildMidLayer();
+        BuildLowLayer();
+        BuildDeepLayer();
+
     }
 
     void BuildSurface()
@@ -210,7 +221,26 @@ public class GridManager : MonoBehaviour
             {
                 for (int k = 0; k < surface.zSize; k++)
                 {
-                    surface.Fill(i, j, k, 0, 0, Side.Mid);
+                    int r = 0;
+                    int damage = 5;
+                    if(j==0 && i != 7)
+                    {
+                        r = 1;
+                    }
+                    if(j==0 && i == 7)
+                    {
+                        damage = 0;
+                    }
+                    if(j==2 && i==surface.xSize-1)
+                    {
+                        r = 6;
+                    }
+                    if (j == 2 && i == surface.xSize - 2)
+                    {
+                        r = 7;
+                    }
+                    surface.Fill(i, j, k, r, damage, Side.Mid);
+                    //surface.Smash(i, j, k, 5, Side.Mid, true);
                 }
             }
         }
@@ -239,13 +269,13 @@ public class GridManager : MonoBehaviour
                     {
                         r = 1; // granicrete
                     }
-                    else if(j > topLayer.ySize - 3)
+                    else if(j > topLayer.ySize - 4)
                     {
                         r = 0; // dirt
                     }
                     else
                     {
-                        r = Random.Range(2, 5);
+                        r = GetRandomOre(j, 0, 8, 0, 19, 14, 0, 0);
                     }
                     if (r > 1)
                     {
@@ -276,13 +306,18 @@ public class GridManager : MonoBehaviour
                     int r = 0;
                     int damage = 0;
                     Side side = Side.Mid;
-                    if (i == 0 || i == (midLayer.xSize - 1) || (j == midLayer.ySize - 2 && (k == 0 || k==1)))
+                    if (i == 0 || i == (midLayer.xSize - 1) || (j == midLayer.ySize - 2 && (k == 0 || k==1)) || ((k == midLayer.zSize - 1) && j==0))
                     {
                         r = 1;
                     }
                     else
                     {
-                        r = Random.Range(2, 5);
+                        r = GetRandomOre(j, k, 0, 0, 7, 5, 1, 0);
+                        if (k==midLayer.zSize-2 && j==0)
+                        {
+                            // add some random granicrete
+                            r = Random.Range(1, 3);
+                        }
                     }
                     if (r > 1)
                     {
@@ -319,7 +354,7 @@ public class GridManager : MonoBehaviour
                     }
                     else
                     {
-                        r = Random.Range(2, 5);
+                        r = GetRandomOre(j, k, 0, 0, 9, 6, 4, 3);
                     }
                     if(r > 1)
                     {
@@ -356,7 +391,7 @@ public class GridManager : MonoBehaviour
                     }
                     else
                     {
-                        r = Random.Range(2, 5);
+                        r = GetRandomOre(j, k, 0, 0, 3, 7, 5, 6);
                     }
                     if (r > 1)
                     {
@@ -367,6 +402,40 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    int GetRandomOre(int y, int z, int dRate, int gRate, int bRate, int cRate, int fRate, int mRate)
+    {
+        // rarer ore deeper down
+        // 0 dirt
+        // 1 granicrete
+        // 2 bould
+        // 3 cobb
+        // 4 ferr
+        // 5 mith
+        int sum = dRate + gRate + bRate + cRate + fRate + mRate + z + y;
+        int r = Random.Range(0, sum);
+
+        r -= dRate;
+        if (r < 0)
+            return 0;
+        r -= gRate;
+        if (r < 0)
+            return 1;
+        r -= bRate;
+        if (r < 0)
+            return 2;
+        r -= cRate;
+        if (r < 0)
+            return 3;
+        r -= fRate + y;
+        if (r < 0)
+            return 4;
+        r -= mRate + z;
+        if (r < 0)
+            return 5;
+
+        return 2; // boulder is base
     }
 
     int GetRandomDamage()
@@ -436,11 +505,13 @@ public class GridManager : MonoBehaviour
 
     void SpawnPlayer()
     {
-        player.xPos = 3;
-        player.yPos = 0; // topLayer.ySize-1;
+        player.xPos = 0;
+        player.yPos = 1; // topLayer.ySize-1;
         player.zPos = 0;
         player.grid = surface;
         player.gameObject.SetActive(true);
+
+        player.OnRopeEnd += ResetWorld;
 
         // sets up where the layers move to
         surface.SetupPlayer();
@@ -448,13 +519,14 @@ public class GridManager : MonoBehaviour
         midLayer.SetupPlayer();
         lowerLayer.SetupPlayer();
         deepLayer.SetupPlayer();
-        Invoke("SmashStart", 0.1f);
+        SmashStart();
+        //Invoke("SmashStart", 0.1f);
     }
 
     void SmashStart()
     {
         // the problem was the ore was setting its hp at start
-        Smash(player.xPos, player.yPos, player.zPos, 100, Side.Mid);
+        Smash(player.xPos, player.yPos, player.zPos, 100, Side.Mid, true);
 
     }
 }
