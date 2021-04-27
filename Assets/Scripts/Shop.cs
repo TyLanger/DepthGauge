@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,14 +8,19 @@ public class Shop : Ore
 {
 
     public PlayerController player;
+    TextMeshPro tmp;
     //public UnityEvent onSmash; // add which upgrade I want in the editor
     public int price;
+
+    int upgrades = 0;
 
     public int shopType = 0;
 
     private void Start()
     {
         player = FindObjectOfType<PlayerController>();
+        tmp = GetComponentInChildren<TextMeshPro>();
+        tmp.text = $"{price}";
     }
 
     public override void Smash(int power, Side hitFrom, bool obliterate = false)
@@ -36,6 +42,9 @@ public class Shop : Ore
                 {
                     UpgradePack();
                 }
+                upgrades++;
+                price += 125;
+                tmp.text = $"{price}";
             }
         }
     }
@@ -47,6 +56,9 @@ public class Shop : Ore
 
     public void UpgradePack()
     {
-        player.UpgradePack();
+        // 75 base + 75 = 150
+        // + 125 = 275
+        // + 175 = 550
+        player.UpgradePack(75 + upgrades * 50);
     }
 }

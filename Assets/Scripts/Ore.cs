@@ -18,6 +18,7 @@ public class Ore : MonoBehaviour
 
     public OreType oreType;
     public static event Action<OreType, int> OnMined;
+    public static event Action<OreType> OnMidMined;
 
     // Start is called before the first frame update
     void Awake()
@@ -73,6 +74,9 @@ public class Ore : MonoBehaviour
         // if hit from the left, destroy left sprite first
         power = Mathf.Clamp(power-hardness, 0, maxHp);
         int damageDone = Mathf.Min(currentHp, power);
+
+        bool midActiveBefore = midSprite.activeSelf;
+
         if (damageDone > 0)
         {
             switch (hitFrom)
@@ -108,6 +112,11 @@ public class Ore : MonoBehaviour
         if (!obliterate)
         {
             OnMined?.Invoke(oreType, damageDone);
+            if(midActiveBefore && !midSprite.activeSelf)
+            {
+                // active before and not now
+                OnMidMined?.Invoke(oreType);
+            }
         }
     }
 

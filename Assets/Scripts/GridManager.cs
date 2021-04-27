@@ -389,9 +389,14 @@ public class GridManager : MonoBehaviour
                     {
                         r = 1;
                     }
+                    else if(k == 2 && j == 2 && (i+1)%3==0)
+                    {
+                        // 3 guaranteed spawns
+                        r = 8; // Diga Brass
+                    }
                     else
                     {
-                        r = GetRandomOre(j, k, 0, 0, 3, 7, 5, 6);
+                        r = GetRandomOre(j, k, 0, 0, 3, 7, 5, 6, 1);
                     }
                     if (r > 1)
                     {
@@ -404,7 +409,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    int GetRandomOre(int y, int z, int dRate, int gRate, int bRate, int cRate, int fRate, int mRate)
+    int GetRandomOre(int y, int z, int dRate, int gRate, int bRate, int cRate, int fRate, int mRate, int gbRate=0)
     {
         // rarer ore deeper down
         // 0 dirt
@@ -413,7 +418,7 @@ public class GridManager : MonoBehaviour
         // 3 cobb
         // 4 ferr
         // 5 mith
-        int sum = dRate + gRate + bRate + cRate + fRate + mRate + z + y;
+        int sum = dRate + gRate + bRate + cRate + fRate + mRate + (gbRate*z) + z + y;
         int r = Random.Range(0, sum);
 
         r -= dRate;
@@ -434,6 +439,9 @@ public class GridManager : MonoBehaviour
         r -= mRate + z;
         if (r < 0)
             return 5;
+        r -= gbRate*z;
+        if (r < 0)
+            return 8;
 
         return 2; // boulder is base
     }

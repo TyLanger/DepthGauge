@@ -6,7 +6,7 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-
+    public SpriteRenderer pickaxe;
     public OreGrid grid;
     public GridManager gridManager;
     public int xPos = 5;
@@ -28,29 +28,42 @@ public class PlayerController : MonoBehaviour
     int lastAnchorZ = 0;
     public Rope rope;
     bool usingRope = false;
+    int lastZLayer;
 
     public float timeBetweenMovements = 0.1f;
     float timeOfLastMovement = -1;
     public float moveSpeed = 1;
     public float fallSpeed = 3;
-    bool playerControlled = true;
+    public bool playerControlled = true;
 
     public int pickPower = 1;
     public int maxPickPower = 3;
+    [SerializeField]
     int backPack = 0;
-    public int backPackCap = 50;
-    public int maxBackPackCap = 150;
+    public int backPackCap = 75;
+    //public int maxBackPackCap = 150;
     int[] currentOres;
+    [SerializeField]
     int money = 0;
+    public float[] oreValues;
     
     public TextFade pickupTextPrefab;
     Queue<TextFade> pickupTextQueue;
     int pickupQueueLength = 3;
     Vector3 pickupOffset = new Vector3(1, 0, -0.5f);
 
+    AudioSource pickHit;
+    public float minPitch = 1.5f;
+    public float maxPitch = 1.7f;
+    //public AudioSource zipSound;
+
     public event Action<int> OnPlayerChangeLayer;
     public event Action OnRopeStart;
     public event Action OnRopeEnd;
+    public event Action<int> OnMoneyChanged;
+    public event Action<int, int> OnOreChanged;
+    public event Action<int, int> OnPackFillChanged;
+    public event Action OnBagFull;
 
     Vector3 targetPos;
 
@@ -59,6 +72,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        pickHit = GetComponent<AudioSource>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         targetPos = transform.position;
         currentOres = new int[Enum.GetNames(typeof(OreType)).Length];
@@ -77,6 +91,12 @@ public class PlayerController : MonoBehaviour
         // even tho I'm clamping input, raw works better
         xMove = (int)Mathf.Clamp(horInput, -1, 1);
         yMove = (int)Mathf.Clamp(vertInput, -1, 1);
+
+        if (xMove != 0)
+        {
+            transform.localScale = new Vector3(xMove, transform.localScale.y, transform.localScale.z);
+        }
+
         if (Input.GetKey(KeyCode.R))
         {
             depthInput = 1;
@@ -130,6 +150,17 @@ public class PlayerController : MonoBehaviour
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
         }
+        else
+        {
+            spriteRenderer.sortingOrder = (int)transform.position.z * -10 + 5; // +5 to stay on top of blocks
+            pickaxe.sortingOrder = (int)transform.position.z * -10 + 6;
+            int currentZ = (int)transform.position.z;
+            if (currentZ != lastZLayer)
+            {
+                lastZLayer = currentZ;
+                OnPlayerChangeLayer?.Invoke(lastZLayer);
+            }
+        }
         //transform.position = Vector3.MoveTowards(transform.position, )
     }
 
@@ -137,9 +168,11 @@ public class PlayerController : MonoBehaviour
     {
         if (!usingRope)
         {
+            //zipSound.Play();
             usingRope = true;
             OnRopeStart?.Invoke();
             rope.StartPulling();
+            lastZLayer = zPos;
         }
     }
 
@@ -150,19 +183,31 @@ public class PlayerController : MonoBehaviour
         targetPos = transform.position + (smashPos - transform.position)/2;
         yield return new WaitForSeconds(timeBetweenMovements *0.4f); // slightly faster than time between movements
         Side sideHitFrom = GetSideHitFrom(x, y);
-        gridManager.Smash(x, y, z, pickPower, sideHitFrom);
+        if (IsBagFull())
+        {
+
+        }
+        else
+        {
+            pickHit.pitch = UnityEngine.Random.Range(minPitch, maxPitch);
+            pickHit.Play();
+            gridManager.Smash(x, y, z, pickPower, sideHitFrom);
+        }
         targetPos = oldPos;
         UpdateGravity();
     }
 
     void CollectOre(OreType type, int amount)
     {
+        if (amount == 0)
+            return;
         currentOres[(int)type] += amount;
         backPack += amount;
+        OnPackFillChanged?.Invoke(backPack, backPackCap);
         // +amount type (total)
         //Debug.Log($"Gained {type} ({currentOres[(int)type]})");
 
-        if(pickupTextQueue.Count < pickupQueueLength)
+        if (pickupTextQueue.Count < pickupQueueLength)
         {
             // create a new one
             TextFade copy = Instantiate(pickupTextPrefab);
@@ -176,16 +221,25 @@ public class PlayerController : MonoBehaviour
         next.Reset();
         pickupTextQueue.Enqueue(next); // recycle
         //pickupText.text = $"+{amount} {type} ({currentOres[(int)type]})";
-        if(backPack >= backPackCap)
+
+        OnOreChanged?.Invoke((int)type, currentOres[(int)type]);
+
+        if (IsBagFull())
         {
             BagFull();
         }
+    }
+
+    bool IsBagFull()
+    {
+        return backPack >= backPackCap;
     }
 
     void BagFull()
     {
         // maybe wait a sec
         //UseRope();
+        OnBagFull?.Invoke();
     }
 
     public void UpgradePick()
@@ -193,9 +247,10 @@ public class PlayerController : MonoBehaviour
         pickPower++;
     }
 
-    public void UpgradePack()
+    public void UpgradePack(int size)
     {
-        backPackCap += 50;
+        backPackCap += size;
+        OnPackFillChanged?.Invoke(backPack, backPackCap);
     }
 
     public bool CanPay(int price)
@@ -206,6 +261,7 @@ public class PlayerController : MonoBehaviour
     public void Pay(int price)
     {
         money -= price;
+        OnMoneyChanged?.Invoke(money);
     }
 
     Side GetSideHitFrom(int blockX, int blockY)
@@ -233,6 +289,7 @@ public class PlayerController : MonoBehaviour
     void UpdateDepth()
     {
         spriteRenderer.sortingOrder = -zPos * 10 + 5; // +5 to stay on top of blocks
+        pickaxe.sortingOrder = -zPos * 10 + 6;
         OnPlayerChangeLayer?.Invoke(zPos);
     }
 
@@ -364,6 +421,24 @@ public class PlayerController : MonoBehaviour
         OnRopeEnd?.Invoke();
         // should maybe do a cutscene here
         // also I probably fall in a hole
+        // DumpOre()
+        money += CalculateMoney();
+        OnMoneyChanged?.Invoke(money);
+        backPack = 0;
+        OnPackFillChanged?.Invoke(backPack, backPackCap);
+    }
+
+    int CalculateMoney()
+    {
+        int sum = 0;
+        for (int i = 0; i < currentOres.Length; i++)
+        {
+            sum += (int)(currentOres[i] * oreValues[i]);
+            currentOres[i] = 0;
+            OnOreChanged?.Invoke(i, 0);
+
+        }
+        return sum;
     }
 
     // unused
